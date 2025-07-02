@@ -27,7 +27,7 @@ type KvClient struct {
 }
 
 func (kvClient *KvClient) Get(key string) (string, error) {
-	_, err := kvClient.conn.Write([]byte("GET " + key))
+	_, err := kvClient.conn.Write([]byte("GET " + key + "\n"))
 	if err != nil {
 		return "", err
 	}
@@ -57,8 +57,8 @@ func (kvClient *KvClient) Set(params SetParams) error {
 		actualExp = params.Exp
 	}
 
-	writer := bufio.NewWriter(kvClient.conn)
-	_, err := writer.WriteString(fmt.Sprintf("%s %s %d\n", params.Key, params.Value, actualExp))
+	_, err := kvClient.conn.Write([]byte(fmt.Sprintf("SET %s %s %d\n", params.Key, params.Value, actualExp)))
+
 	if err != nil {
 		return err
 	}
@@ -97,6 +97,7 @@ func CreateKvClient(expDefault int64) (*KvClient, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	client := &KvClient{
 		conn: conn,
 	}

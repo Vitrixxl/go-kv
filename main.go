@@ -95,12 +95,17 @@ func handleConnection(conn net.Conn, appData *AppData) {
 
 		byteMessage, _, err := reader.ReadLine()
 		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
 			log.Printf("Error while reading the line : %s\n", err.Error())
 			continue
 		}
 
+		fmt.Println(string(byteMessage))
 		args := strings.Split(strings.ToLower(string(byteMessage)), " ")
 		argsLen := len(args)
+		log.Printf("Query recieved : %s", strings.Join(args, " "))
 
 		switch args[0] {
 		case "set":
